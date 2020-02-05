@@ -35,14 +35,17 @@
 
 ChartView::ChartView(QChart *chart, QWidget *parent) :
     QChartView(chart, parent),
-    m_isTouching(false)
+    m_isTouching(false),
+    old_value_slide(0)
 {
-    setRubberBand(QChartView::RectangleRubberBand);
+ //   setRubberBand(QChartView::RectangleRubberBand);
+
+    setRubberBand(QChartView::HorizontalRubberBand);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     QChartView::horizontalScrollBar()->disconnect();
     connect(QChartView::horizontalScrollBar(), &QScrollBar::valueChanged, this, &ChartView::valueChangedScroll);
-    old_value_slide = 0;
+
 
 }
 
@@ -75,6 +78,8 @@ void ChartView::mousePressEvent(QMouseEvent *event)
     if (m_isTouching)
         return;
     QChartView::mousePressEvent(event);
+    frame_mouse.setLeft(event->x());
+    frame_mouse.setTop(event->y());
 }
 
 void ChartView::mouseMoveEvent(QMouseEvent *event)
@@ -88,15 +93,18 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_isTouching)
         m_isTouching = false;
-
     // Because we disabled animations when touch event was detected
     // we must put them back on.
 //    chart()->setAnimationOptions(QChart::SeriesAnimations);
-
+    frame_mouse.setRight(event->x());
+    frame_mouse.setBottom(event->y());
     QChartView::mouseReleaseEvent(event);
-  //  chart()->
-    QChartView::horizontalScrollBar()->setRange(0, plot0.width());
-
+    int kx = qRound( plot0.width()/frame_mouse.width() );
+  //  QChartView::horizontalScrollBar()->setRange(0, plot0.width()*kx);
+     int pgs = QChartView::horizontalScrollBar()->pageStep();
+     QChartView::horizontalScrollBar()->setRange(0, (kx-1)*pgs);
+  //  int dx_val = (frame_mouse.left() - plot0.x())*kx;
+  //  QChartView::horizontalScrollBar()->setValue(dx_val);
 }
 
 //![1]
@@ -132,4 +140,5 @@ void ChartView::resizeEvent(QResizeEvent *event)
 {
     QChartView::resizeEvent(event);
     plot0 = chart()->plotArea();
+
 }

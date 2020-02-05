@@ -57,6 +57,7 @@ protected:
 
 private:
     bool m_isTouching;
+    QRect frame_mouse;
     QRectF plot0;
     int old_value_slide;
 };
