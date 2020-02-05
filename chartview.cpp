@@ -95,16 +95,19 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
         m_isTouching = false;
     // Because we disabled animations when touch event was detected
     // we must put them back on.
-//    chart()->setAnimationOptions(QChart::SeriesAnimations);
+    //    chart()->setAnimationOptions(QChart::SeriesAnimations);
     frame_mouse.setRight(event->x());
     frame_mouse.setBottom(event->y());
     QChartView::mouseReleaseEvent(event);
     int kx = qRound( plot0.width()/frame_mouse.width() );
-  //  QChartView::horizontalScrollBar()->setRange(0, plot0.width()*kx);
-     int pgs = QChartView::horizontalScrollBar()->pageStep();
-     QChartView::horizontalScrollBar()->setRange(0, (kx-1)*pgs);
-  //  int dx_val = (frame_mouse.left() - plot0.x())*kx;
-  //  QChartView::horizontalScrollBar()->setValue(dx_val);
+    //  QChartView::horizontalScrollBar()->setRange(0, plot0.width()*kx);
+    pgs = frame_mouse.width() ;
+    QChartView::horizontalScrollBar()->setPageStep(pgs);
+    // pgs = QChartView::horizontalScrollBar()->pageStep();
+    QChartView::horizontalScrollBar()->setRange(0, (kx-1)*pgs);
+
+    //  int dx_val = (frame_mouse.left() - plot0.x())*kx;
+    //  QChartView::horizontalScrollBar()->setValue(dx_val);
 }
 
 //![1]
