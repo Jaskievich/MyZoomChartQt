@@ -60,7 +60,6 @@ private:
     QRect frame_mouse;
     QRectF plot0;
     int old_value_slide;
-    int pgs;
 };
 
 #endif

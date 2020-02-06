@@ -99,15 +99,14 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     frame_mouse.setRight(event->x());
     frame_mouse.setBottom(event->y());
     QChartView::mouseReleaseEvent(event);
-    int kx = qRound( plot0.width()/frame_mouse.width() );
-    //  QChartView::horizontalScrollBar()->setRange(0, plot0.width()*kx);
-    pgs = frame_mouse.width() ;
-    QChartView::horizontalScrollBar()->setPageStep(pgs);
-    // pgs = QChartView::horizontalScrollBar()->pageStep();
-    QChartView::horizontalScrollBar()->setRange(0, (kx-1)*pgs);
+   // int kx = qRound( plot0.width()/frame_mouse.width() );
+    qreal kx = plot0.width()/frame_mouse.width();
+   // int pgs = frame_mouse.width() ;
+   // QChartView::horizontalScrollBar()->setPageStep(pgs);
+    int dx_val = (frame_mouse.left() - plot0.left())*(kx-1);
+    QChartView::horizontalScrollBar()->setRange(-dx_val, (kx - 1)*plot0.width() - dx_val);
+   // QChartView::horizontalScrollBar()->setRange(0, (kx-1)*plot0.width());
 
-    //  int dx_val = (frame_mouse.left() - plot0.x())*kx;
-    //  QChartView::horizontalScrollBar()->setValue(dx_val);
 }
 
 //![1]
