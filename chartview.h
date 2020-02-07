@@ -60,6 +60,8 @@ private:
     QRect frame_mouse;
     QRectF plot0;
     int old_value_slide;
+    int dx_val_begin;
+    qreal kx;
 };
 
 #endif

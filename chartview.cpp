@@ -36,7 +36,8 @@
 ChartView::ChartView(QChart *chart, QWidget *parent) :
     QChartView(chart, parent),
     m_isTouching(false),
-    old_value_slide(0)
+    old_value_slide(0),
+    kx(1.0)
 {
  //   setRubberBand(QChartView::RectangleRubberBand);
 
@@ -45,13 +46,15 @@ ChartView::ChartView(QChart *chart, QWidget *parent) :
     setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     QChartView::horizontalScrollBar()->disconnect();
     connect(QChartView::horizontalScrollBar(), &QScrollBar::valueChanged, this, &ChartView::valueChangedScroll);
-
+    dx_val_begin = 0;
 
 }
 
 void ChartView::valueChangedScroll(int value)
 {
-    chart()->scroll(value - old_value_slide, 0);
+    int dx = value - old_value_slide;
+    dx_val_begin += dx;
+    chart()->scroll(dx, 0);
     old_value_slide = value;
 }
 
@@ -99,13 +102,13 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     frame_mouse.setRight(event->x());
     frame_mouse.setBottom(event->y());
     QChartView::mouseReleaseEvent(event);
-   // int kx = qRound( plot0.width()/frame_mouse.width() );
-    qreal kx = plot0.width()/frame_mouse.width();
-   // int pgs = frame_mouse.width() ;
-   // QChartView::horizontalScrollBar()->setPageStep(pgs);
-    int dx_val = (frame_mouse.left() - plot0.left())*(kx-1);
-    QChartView::horizontalScrollBar()->setRange(-dx_val, (kx - 1)*plot0.width() - dx_val);
-   // QChartView::horizontalScrollBar()->setRange(0, (kx-1)*plot0.width());
+    if( frame_mouse.width() == 1 ) return;
+    qreal _kx = plot0.width()/frame_mouse.width();
+    kx *= _kx;
+    dx_val_begin += (frame_mouse.left() - plot0.left())*kx;
+    int _dx_val_begin = dx_val_begin;
+    int max = (kx - 1) *plot0.width() - _dx_val_begin;
+    QChartView::horizontalScrollBar()->setRange(-_dx_val_begin,  max);
 
 }
 
@@ -131,6 +134,13 @@ void ChartView::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_Down:
         chart()->scroll(0, -10);
+        break;
+    case Qt::Key_Escape:
+        chart()->zoomReset();
+        kx = 1.0;
+      //  chart()->scroll(-dx_val_begin, 0);
+        dx_val_begin = 0;
+        QChartView::horizontalScrollBar()->setRange(0, 0);
         break;
     default:
         QGraphicsView::keyPressEvent(event);
