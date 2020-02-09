@@ -58,10 +58,11 @@ protected:
 private:
     bool m_isTouching;
     QRect frame_mouse;
-    QRectF plot0;
+  //  QRectF plot0;
+    int width_range;
     int old_value_slide;
     int dx_val_begin;
-    qreal kx;
+    qreal kx, kx_1;
 };
 
 #endif

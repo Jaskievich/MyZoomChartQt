@@ -32,6 +32,8 @@
 #include "qchartview_p.h"
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QDateTimeAxis>
+#include <QValueAxis>
 
 ChartView::ChartView(QChart *chart, QWidget *parent) :
     QChartView(chart, parent),
@@ -47,13 +49,14 @@ ChartView::ChartView(QChart *chart, QWidget *parent) :
     QChartView::horizontalScrollBar()->disconnect();
     connect(QChartView::horizontalScrollBar(), &QScrollBar::valueChanged, this, &ChartView::valueChangedScroll);
     dx_val_begin = 0;
+    kx_1 = 1.0;
 
 }
 
 void ChartView::valueChangedScroll(int value)
 {
     int dx = value - old_value_slide;
-    dx_val_begin += dx;
+//    dx_val_begin += dx;
     chart()->scroll(dx, 0);
     old_value_slide = value;
 }
@@ -101,14 +104,31 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     //    chart()->setAnimationOptions(QChart::SeriesAnimations);
     frame_mouse.setRight(event->x());
     frame_mouse.setBottom(event->y());
+
+
     QChartView::mouseReleaseEvent(event);
     if( frame_mouse.width() == 1 ) return;
-    qreal _kx = plot0.width()/frame_mouse.width();
-    kx *= _kx;
-    dx_val_begin += (frame_mouse.left() - plot0.left())*kx;
-    int _dx_val_begin = dx_val_begin;
-    int max = (kx - 1) *plot0.width() - _dx_val_begin;
-    QChartView::horizontalScrollBar()->setRange(-_dx_val_begin,  max);
+//    int w = frame_mouse.width();
+//    qreal _kx = plot0.width()/frame_mouse.width();
+//    kx *= _kx;
+//    kx_1 *= _kx - 1;
+//    dx_val_begin += (frame_mouse.left() - plot0.left())*kx;
+//    int _dx_val_begin = dx_val_begin;
+//    int max = kx_1 *plot0.width() - _dx_val_begin;
+//    QChartView::horizontalScrollBar()->setRange(-_dx_val_begin,  max);
+      qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
+
+      kx *= _kx;
+      dx_val_begin += (frame_mouse.left() - chart()->plotArea().left())*kx;
+
+
+   //   width_range *= _kx - 1;
+
+      int _width_range = chart()->plotArea().width()*(kx - 1);
+
+
+     QChartView::horizontalScrollBar()->setRange(-dx_val_begin, _width_range - dx_val_begin );
+
 
 }
 
@@ -151,6 +171,7 @@ void ChartView::keyPressEvent(QKeyEvent *event)
 void ChartView::resizeEvent(QResizeEvent *event)
 {
     QChartView::resizeEvent(event);
-    plot0 = chart()->plotArea();
+ //   plot0 = chart()->plotArea();
+     width_range = chart()->plotArea().width();
 
 }
