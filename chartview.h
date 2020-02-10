@@ -60,6 +60,7 @@ private:
     QRect frame_mouse;
     int old_value_slide;
     int dx_val_begin;
+    int width_range;
     qreal kx;
 };
 

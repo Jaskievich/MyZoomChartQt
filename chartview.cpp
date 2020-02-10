@@ -29,7 +29,6 @@
 
 #include "chartview.h"
 #include <QtGui/QMouseEvent>
-#include "qchartview_p.h"
 #include <QScrollBar>
 #include <QMessageBox>
 #include <QDateTimeAxis>
@@ -109,8 +108,8 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
     dx_val_begin = static_cast<int>(dx_val_begin*(_kx)+(frame_mouse.left() - chart()->plotArea().left())*_kx);
     kx *= _kx;
-    int _width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
-    QChartView::horizontalScrollBar()->setRange(-dx_val_begin, _width_range - dx_val_begin );
+    width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
+    QChartView::horizontalScrollBar()->setRange(-dx_val_begin, width_range - dx_val_begin );
     old_value_slide = 0;
 }
 
