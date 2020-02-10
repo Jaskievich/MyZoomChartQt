@@ -52,17 +52,15 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
-    void resizeEvent(QResizeEvent *event);
+ //   void resizeEvent(QResizeEvent *event);
 //![2]
 
 private:
     bool m_isTouching;
     QRect frame_mouse;
-  //  QRectF plot0;
-    int width_range;
     int old_value_slide;
     int dx_val_begin;
-    qreal kx, kx_1;
+    qreal kx;
 };
 
 #endif

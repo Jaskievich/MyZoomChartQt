@@ -49,14 +49,13 @@ ChartView::ChartView(QChart *chart, QWidget *parent) :
     QChartView::horizontalScrollBar()->disconnect();
     connect(QChartView::horizontalScrollBar(), &QScrollBar::valueChanged, this, &ChartView::valueChangedScroll);
     dx_val_begin = 0;
-    kx_1 = 1.0;
 
 }
 
 void ChartView::valueChangedScroll(int value)
 {
     int dx = value - old_value_slide;
-//    dx_val_begin += dx;
+    dx_val_begin += dx;
     chart()->scroll(dx, 0);
     old_value_slide = value;
 }
@@ -104,32 +103,15 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     //    chart()->setAnimationOptions(QChart::SeriesAnimations);
     frame_mouse.setRight(event->x());
     frame_mouse.setBottom(event->y());
-
-
     QChartView::mouseReleaseEvent(event);
+
     if( frame_mouse.width() == 1 ) return;
-//    int w = frame_mouse.width();
-//    qreal _kx = plot0.width()/frame_mouse.width();
-//    kx *= _kx;
-//    kx_1 *= _kx - 1;
-//    dx_val_begin += (frame_mouse.left() - plot0.left())*kx;
-//    int _dx_val_begin = dx_val_begin;
-//    int max = kx_1 *plot0.width() - _dx_val_begin;
-//    QChartView::horizontalScrollBar()->setRange(-_dx_val_begin,  max);
-      qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
-
-      kx *= _kx;
-      dx_val_begin += (frame_mouse.left() - chart()->plotArea().left())*kx;
-
-
-   //   width_range *= _kx - 1;
-
-      int _width_range = chart()->plotArea().width()*(kx - 1);
-
-
-     QChartView::horizontalScrollBar()->setRange(-dx_val_begin, _width_range - dx_val_begin );
-
-
+    qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
+    dx_val_begin = static_cast<int>(dx_val_begin*(_kx)+(frame_mouse.left() - chart()->plotArea().left())*_kx);
+    kx *= _kx;
+    int _width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
+    QChartView::horizontalScrollBar()->setRange(-dx_val_begin, _width_range - dx_val_begin );
+    old_value_slide = 0;
 }
 
 //![1]
@@ -143,12 +125,22 @@ void ChartView::keyPressEvent(QKeyEvent *event)
         chart()->zoomOut();
         break;
 //![1]
-    case Qt::Key_Left:
-        chart()->scroll(-10, 0);
+    case Qt::Key_Left:{
+         chart()->scroll(-10, 0);
+//        int val = QChartView::horizontalScrollBar()->value();
+//        if(val > QChartView::horizontalScrollBar()->minimum() ){
+//            QChartView::horizontalScrollBar()->setValue(QChartView::horizontalScrollBar()->value() - 10);
+//        }
         break;
-    case Qt::Key_Right:
+    }
+    case Qt::Key_Right:{
         chart()->scroll(10, 0);
+//        int val = QChartView::horizontalScrollBar()->value();
+//        if( val < QChartView::horizontalScrollBar()->maximum() ){
+//            QChartView::horizontalScrollBar()->setValue(QChartView::horizontalScrollBar()->value() + 10);
+//        }
         break;
+    }
     case Qt::Key_Up:
         chart()->scroll(0, 10);
         break;
@@ -168,10 +160,8 @@ void ChartView::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void ChartView::resizeEvent(QResizeEvent *event)
-{
-    QChartView::resizeEvent(event);
- //   plot0 = chart()->plotArea();
-     width_range = chart()->plotArea().width();
+//void ChartView::resizeEvent(QResizeEvent *event)
+//{
+//    QChartView::resizeEvent(event);
 
-}
+//}
