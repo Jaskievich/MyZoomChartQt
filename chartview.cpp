@@ -109,7 +109,9 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     dx_val_begin = static_cast<int>(dx_val_begin*(_kx)+(frame_mouse.left() - chart()->plotArea().left())*_kx);
     kx *= _kx;
     width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
-    QChartView::horizontalScrollBar()->setRange(-dx_val_begin, width_range - dx_val_begin );
+    int right_rng = width_range - dx_val_begin;
+    int left_rng = -dx_val_begin;
+    QChartView::horizontalScrollBar()->setRange(left_rng,  right_rng);
     old_value_slide = 0;
 }
 
