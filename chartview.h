@@ -52,7 +52,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
- //   void resizeEvent(QResizeEvent *event);
+    void wheelEvent(QWheelEvent *event);
+
+    void resizeEvent(QResizeEvent *event);
 //![2]
 
 private:
@@ -60,7 +62,7 @@ private:
     QRect frame_mouse;
     int old_value_slide;
     int dx_val_begin;
-    int width_range;
+ //   int width_range;
     qreal kx;
 };
 

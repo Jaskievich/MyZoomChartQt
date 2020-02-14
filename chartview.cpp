@@ -59,6 +59,10 @@ void ChartView::valueChangedScroll(int value)
     old_value_slide = value;
 }
 
+void ChartView::wheelEvent(QWheelEvent *event)
+{
+    if( event->delta() > 0)     chart()->zoomIn(); else chart()->zoomOut();
+}
 
 
 bool ChartView::viewportEvent(QEvent *event)
@@ -108,7 +112,7 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
     dx_val_begin = static_cast<int>(dx_val_begin*(_kx)+(frame_mouse.left() - chart()->plotArea().left())*_kx);
     kx *= _kx;
-    width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
+    int width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
     int right_rng = width_range - dx_val_begin;
     int left_rng = -dx_val_begin;
     QChartView::horizontalScrollBar()->setRange(left_rng,  right_rng);
@@ -161,8 +165,8 @@ void ChartView::keyPressEvent(QKeyEvent *event)
     }
 }
 
-//void ChartView::resizeEvent(QResizeEvent *event)
-//{
-//    QChartView::resizeEvent(event);
+void ChartView::resizeEvent(QResizeEvent *event)
+{
+    QChartView::resizeEvent(event);
 
-//}
+}
