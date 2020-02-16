@@ -42,6 +42,8 @@ class ChartView : public QChartView
 public:
     ChartView(QChart *chart, QWidget *parent = 0);
 
+    void resizeScrollBarr();
+    
 public slots:
     void valueChangedScroll(int value);
 
@@ -59,11 +61,12 @@ protected:
 
 private:
     bool m_isTouching;
-    QRect frame_mouse;
+    QRectF frame_mouse;
     int old_value_slide;
     int dx_val_begin;
  //   int width_range;
     qreal kx;
+    void resizeHorScrollBar(qreal _kx, qreal dx0);
 };
 
 #endif

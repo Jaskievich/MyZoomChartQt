@@ -61,7 +61,14 @@ void ChartView::valueChangedScroll(int value)
 
 void ChartView::wheelEvent(QWheelEvent *event)
 {
-    if( event->delta() > 0)     chart()->zoomIn(); else chart()->zoomOut();
+    if( event->delta() > 0) {
+        chart()->zoomIn();
+        resizeHorScrollBar(2.0, chart()->plotArea().width()/4.0);
+    }else {
+        resizeHorScrollBar(0.5, -kx*chart()->plotArea().width()/4.0);
+        chart()->zoomOut();
+    }
+
 }
 
 
@@ -97,6 +104,17 @@ void ChartView::mouseMoveEvent(QMouseEvent *event)
     QChartView::mouseMoveEvent(event);
 }
 
+void ChartView::resizeHorScrollBar(qreal _kx, qreal dx0)
+{ 
+    dx_val_begin = static_cast<int>(dx_val_begin * _kx + dx0 * _kx);
+    kx *= _kx;
+    int width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
+    int right_rng = width_range - dx_val_begin;
+    int left_rng = -dx_val_begin;
+    QChartView::horizontalScrollBar()->setRange(left_rng,  right_rng);
+    old_value_slide = 0;
+}
+
 void ChartView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_isTouching)
@@ -108,15 +126,10 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     frame_mouse.setBottom(event->y());
     QChartView::mouseReleaseEvent(event);
 
-    if( frame_mouse.width() == 1 ) return;
+    if( frame_mouse.width() == 1.0 ) return;
     qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
-    dx_val_begin = static_cast<int>(dx_val_begin*(_kx)+(frame_mouse.left() - chart()->plotArea().left())*_kx);
-    kx *= _kx;
-    int width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
-    int right_rng = width_range - dx_val_begin;
-    int left_rng = -dx_val_begin;
-    QChartView::horizontalScrollBar()->setRange(left_rng,  right_rng);
-    old_value_slide = 0;
+    qreal dx0 = frame_mouse.left() - chart()->plotArea().left();
+    resizeHorScrollBar(_kx, dx0);
 }
 
 //![1]
@@ -168,5 +181,6 @@ void ChartView::keyPressEvent(QKeyEvent *event)
 void ChartView::resizeEvent(QResizeEvent *event)
 {
     QChartView::resizeEvent(event);
+    frame_mouse = chart()->plotArea();
 
 }
