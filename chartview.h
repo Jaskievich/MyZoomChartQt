@@ -45,7 +45,8 @@ public:
     void resizeScrollBarr();
     
 public slots:
-    void valueChangedScroll(int value);
+  //  void valueChangedScroll(int value);
+    void moveHorScrollBar(int value);
 
 //![2]
 protected:
@@ -67,6 +68,7 @@ private:
  //   int width_range;
     qreal kx;
     void resizeHorScrollBar(qreal _kx, qreal dx0);
+
 };
 
 #endif

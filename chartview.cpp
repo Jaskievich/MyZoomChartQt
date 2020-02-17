@@ -33,6 +33,7 @@
 #include <QMessageBox>
 #include <QDateTimeAxis>
 #include <QValueAxis>
+#include <qdebug.h>
 
 ChartView::ChartView(QChart *chart, QWidget *parent) :
     QChartView(chart, parent),
@@ -40,18 +41,27 @@ ChartView::ChartView(QChart *chart, QWidget *parent) :
     old_value_slide(0),
     kx(1.0)
 {
- //   setRubberBand(QChartView::RectangleRubberBand);
+    setRubberBand(QChartView::RectangleRubberBand);
 
-    setRubberBand(QChartView::HorizontalRubberBand);
+ //   setRubberBand(QChartView::HorizontalRubberBand);
 
     setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOn);
     QChartView::horizontalScrollBar()->disconnect();
-    connect(QChartView::horizontalScrollBar(), &QScrollBar::valueChanged, this, &ChartView::valueChangedScroll);
+  //  connect(QChartView::horizontalScrollBar(), &QScrollBar::valueChanged, this, &ChartView::valueChangedScroll);
+    connect(QChartView::horizontalScrollBar(), &QScrollBar::sliderMoved, this, &ChartView::moveHorScrollBar);
     dx_val_begin = 0;
 
 }
 
-void ChartView::valueChangedScroll(int value)
+//void ChartView::valueChangedScroll(int value)
+//{
+////    int dx = value - old_value_slide;
+////    dx_val_begin += dx;
+////    chart()->scroll(dx, 0);
+////    old_value_slide = value;
+//}
+
+void ChartView::moveHorScrollBar(int value)
 {
     int dx = value - old_value_slide;
     dx_val_begin += dx;
@@ -61,11 +71,14 @@ void ChartView::valueChangedScroll(int value)
 
 void ChartView::wheelEvent(QWheelEvent *event)
 {
+    qreal _kx = 1.0;
     if( event->delta() > 0) {
         chart()->zoomIn();
-        resizeHorScrollBar(2.0, chart()->plotArea().width()/4.0);
+        if( kx < 1 ) _kx = 0.5;
+        resizeHorScrollBar(2.0, _kx*chart()->plotArea().width()/4.0);
     }else {
-        resizeHorScrollBar(0.5, -kx*chart()->plotArea().width()/4.0);
+        if( kx > 1 ) _kx = 2.0;
+        resizeHorScrollBar(0.5, -_kx*chart()->plotArea().width()/4.0);
         chart()->zoomOut();
     }
 
@@ -106,7 +119,7 @@ void ChartView::mouseMoveEvent(QMouseEvent *event)
 
 void ChartView::resizeHorScrollBar(qreal _kx, qreal dx0)
 { 
-    dx_val_begin = static_cast<int>(dx_val_begin * _kx + dx0 * _kx);
+    dx_val_begin = static_cast<int>( (dx_val_begin + dx0 ) * _kx);
     kx *= _kx;
     int width_range = static_cast<int>(chart()->plotArea().width()*(kx - 1));
     int right_rng = width_range - dx_val_begin;
@@ -126,7 +139,7 @@ void ChartView::mouseReleaseEvent(QMouseEvent *event)
     frame_mouse.setBottom(event->y());
     QChartView::mouseReleaseEvent(event);
 
-    if( frame_mouse.width() == 1.0 ) return;
+    if( frame_mouse.width() == 0 ) return;
     qreal _kx = chart()->plotArea().width()/(frame_mouse.width());
     qreal dx0 = frame_mouse.left() - chart()->plotArea().left();
     resizeHorScrollBar(_kx, dx0);
@@ -152,6 +165,7 @@ void ChartView::keyPressEvent(QKeyEvent *event)
         break;
     }
     case Qt::Key_Right:{
+
         chart()->scroll(10, 0);
 //        int val = QChartView::horizontalScrollBar()->value();
 //        if( val < QChartView::horizontalScrollBar()->maximum() ){
@@ -170,6 +184,7 @@ void ChartView::keyPressEvent(QKeyEvent *event)
         kx = 1.0;
       //  chart()->scroll(-dx_val_begin, 0);
         dx_val_begin = 0;
+        old_value_slide = 0;
         QChartView::horizontalScrollBar()->setRange(0, 0);
         break;
     default:
@@ -181,6 +196,5 @@ void ChartView::keyPressEvent(QKeyEvent *event)
 void ChartView::resizeEvent(QResizeEvent *event)
 {
     QChartView::resizeEvent(event);
-    frame_mouse = chart()->plotArea();
-
+  //  frame_mouse = chart()->plotArea();
 }
